@@ -20,8 +20,8 @@ chdir $ENV{HOME};
 my $dbh = DBI->connect("dbi:SQLite:db=$sqlite","","");
 
 my $twitter = Net::Twitter::Lite->new(
-    username => $config->{'username'},
-    password => $config->{'password'},
+    username => $json->{'username'},
+    password => $json->{'password'},
 );
 
 while ( 1 ) {
