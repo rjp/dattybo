@@ -37,9 +37,9 @@ while ( 1 ) {
     my $dm = $twitter->direct_messages();
     foreach my $i (@{$dm}) {
         # process them here if we've not seen them before
-        my $from = $dm->{'sender_screen_name'};
-        my $dmid = $dm->{'id'};
-        my $text = $dm->{'text'};
+        my $from = $i->{'sender_screen_name'};
+        my $dmid = $i->{'id'};
+        my $text = $i->{'text'};
         my ($key, $value) = split(' ', $text, 2);
     }
     sleep 60;
