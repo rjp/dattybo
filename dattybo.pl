@@ -24,6 +24,15 @@ my $twitter = Net::Twitter::Lite->new(
     password => $json->{'password'},
 );
 
+# work out the maximum ID we've seen so far
+my $max_id = 0;
+my $metadata = $dbh->selectall_arrayref('SELECT * FROM dm_seen', {Slice=>{}});
+if (defined $metadata and defined $metadata->[0]) {
+    $max_id = $metadata->[0]->{'id'};
+    print "db says max_id is $max_id\n";
+}
+print "max_id is $max_id\n";
+
 while ( 1 ) {
     my $dm = $twitter->direct_messages();
     foreach my $i (@{$dm}) {
