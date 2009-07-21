@@ -44,14 +44,14 @@ while ( 1 ) {
         my ($key, $value) = split(' ', $text, 2);
 
         if ($dmid > $max_id) {
-            print "$dmid > $max_id so updating db\n";
+            print "$dmid > $max_id: $key = $value\n";
             $dbh->begin_work();
             $dbh->do("INSERT INTO datalog (name, key, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
             $dbh->do("UPDATE dm_seen SET id=?", undef, $dmid);
             $dbh->commit();
             $max_id = $dmid;
         } else {
-            print "$dmid <= $max_id so assuming already seen\n";
+            print "$dmid <= $max_id: ignoring\n";
         }
     }
     sleep 60;
