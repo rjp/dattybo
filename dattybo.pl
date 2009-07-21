@@ -35,12 +35,24 @@ print "max_id is $max_id\n";
 
 while ( 1 ) {
     my $dm = $twitter->direct_messages();
-    foreach my $i (@{$dm}) {
+    print "processing dms\n";
+    foreach my $i (sort {$a->{'id'} <=> $b->{'id'}} @{$dm}) {
         # process them here if we've not seen them before
         my $from = $i->{'sender_screen_name'};
         my $dmid = $i->{'id'};
         my $text = $i->{'text'};
         my ($key, $value) = split(' ', $text, 2);
+
+        if ($dmid > $max_id) {
+            print "$dmid > $max_id so updating db\n";
+            $dbh->begin_work();
+            $dbh->do("INSERT INTO datalog (name, key, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
+            $dbh->do("UPDATE dm_seen SET id=?", undef, $dmid);
+            $dbh->commit();
+            $max_id = $dmid;
+        } else {
+            print "$dmid <= $max_id so assuming already seen\n";
+        }
     }
     sleep 60;
 }
