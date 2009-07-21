@@ -11,13 +11,13 @@ close C;
 my $json = from_json($config);
 
 # TODO get this from the config file
-my $sqlite = ".dattybo.db";
+my $sqlite = "$ENV{HOME}/.dattybo.db";
+print "connecting to $sqlite\n";
 
-# cygwin appears not to like $ENV{HOME} in the dbname
-chdir $ENV{HOME};
+chdir($ENV{HOME});
 
 # we assume the schema is in place already because I can't work table_info
-my $dbh = DBI->connect("dbi:SQLite:db=$sqlite","","");
+my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite","","");
 
 my $twitter = Net::Twitter::Lite->new(
     username => $json->{'username'},
