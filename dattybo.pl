@@ -26,9 +26,9 @@ my $twitter = Net::Twitter::Lite->new(
 
 # work out the maximum ID we've seen so far
 my $max_id = 0;
-my $metadata = $dbh->selectall_arrayref('SELECT * FROM dm_seen', {Slice=>{}});
+my $metadata = $dbh->selectall_arrayref('SELECT value FROM metadata WHERE datakey="max_id"', {Slice=>{}});
 if (defined $metadata and defined $metadata->[0]) {
-    $max_id = $metadata->[0]->{'id'};
+    $max_id = $metadata->[0]->{'value'};
     print "db says max_id is $max_id\n";
 }
 print "max_id is $max_id\n";
@@ -47,8 +47,9 @@ while ( 1 ) {
             print "$dmid > $max_id: $key = $value\n";
             $dbh->begin_work();
             $dbh->do("INSERT INTO datalog (name, key, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
-            $dbh->do("UPDATE dm_seen SET id=?", undef, $dmid);
-            $dbh->commit();
+	            $dbh->do("UPDATE metadata SET value=? WHERE datakey='max_id'", undef, $dmid);
+	            $dbh->commit();
+            }
             $max_id = $dmid;
         } else {
             print "$dmid <= $max_id: ignoring\n";
