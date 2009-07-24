@@ -1,6 +1,7 @@
 use DBI;
 use Net::Twitter::Lite;
 use JSON;
+use Date::Manip;
 
 my $config_file = "$ENV{HOME}/.dattybo";
 
@@ -45,8 +46,23 @@ while ( 1 ) {
 
         if ($dmid > $max_id) {
             print "$dmid > $max_id: $key = $value\n";
-            $dbh->begin_work();
-            $dbh->do("INSERT INTO datalog (name, key, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
+            if ($key =~ /\?$/) { # return today's sum
+                my $date = $value || 'today';
+                my $fmt_date = UnixDate($date, '%Y-%m-%d');
+                my $data = $dbh->selectall_hashref(qq/
+                    SELECT DATE(logged_at) AS logged_date,
+                           COUNT(1) AS logged, MIN(value) AS min,
+                           MAX(value) AS max, AVG(value) AS avg,
+                           SUM(value) AS sum
+                    FROM datalog
+                    WHERE DATE(logged_at) = ?
+                    GROUP BY DATE(logged_at)
+                /, 'logged_date', {}, $fmt_date);
+                print to_json($data),"\n";
+            } else {
+                # insert it as a key/value pair
+	            $dbh->begin_work();
+	            $dbh->do("INSERT INTO datalog (name, datakey, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
 	            $dbh->do("UPDATE metadata SET value=? WHERE datakey='max_id'", undef, $dmid);
 	            $dbh->commit();
             }
