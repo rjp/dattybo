@@ -61,11 +61,9 @@ while ( 1 ) {
                 print to_json($data),"\n";
             } else {
                 # insert it as a key/value pair
-	            $dbh->begin_work();
 	            $dbh->do("INSERT INTO datalog (name, datakey, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
-	            $dbh->do("UPDATE metadata SET value=? WHERE datakey='max_id'", undef, $dmid);
-	            $dbh->commit();
             }
+            $dbh->do("UPDATE metadata SET value=? WHERE datakey='max_id'", undef, $dmid);
             $max_id = $dmid;
         } else {
             print "$dmid <= $max_id: ignoring\n";
