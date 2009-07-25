@@ -59,6 +59,12 @@ while ( 1 ) {
                     GROUP BY DATE(logged_at)
                 /, 'logged_date', {}, $fmt_date);
                 print to_json($data),"\n";
+                my $d = $data->{$fmt_date};
+                my $msg = $d->{logged_date}.": sum=".$d->{sum}.", n=".$d->{logged};
+                if (not defined $d->{logged} or $d->{logged} < 1) {
+                    $msg = $fmt_date.": no data ($value)";
+                }
+                $twitter->new_direct_message($from, $msg);
             } else {
                 # insert it as a key/value pair
 	            $dbh->do("INSERT INTO datalog (name, datakey, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
