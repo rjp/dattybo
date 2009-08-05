@@ -75,5 +75,5 @@ while ( 1 ) {
             print "$dmid <= $max_id: ignoring\n";
         }
     }
-    sleep 60;
+    sleep 120;
 }
