@@ -2,6 +2,7 @@ use DBI;
 use Net::Twitter::Lite;
 use JSON;
 use Date::Manip;
+use Data::Dumper;
 
 my $config_file = "$ENV{HOME}/.dattybo";
 
@@ -42,6 +43,7 @@ while ( 1 ) {
         my $from = $i->{'sender_screen_name'};
         my $dmid = $i->{'id'};
         my $text = $i->{'text'};
+        my $time = $i->{'created_at'};
         my ($key, $value) = split(' ', $text, 2);
 
         if ($dmid > $max_id) {
@@ -66,8 +68,21 @@ while ( 1 ) {
                 }
                 $twitter->new_direct_message($from, $msg);
             } else {
+                my $tv = $time;
                 # insert it as a key/value pair
-	            $dbh->do("INSERT INTO datalog (name, datakey, value, logged_at) VALUES (?,?,?,CURRENT_TIMESTAMP)", undef, $from, $key, $value);
+                if ($value =~ / (@|at) (.+)$/) {
+                    $tv = $2;
+                    $value =~ s/ (@|at) (.+)$//;
+                }
+                if (my $tp = ParseDate($tv)) {
+                    $timestamp = UnixDate($tv, '%Y-%m-%d %H:%M:%S');
+                } else {
+                    die "unparseable timestamp: $2";
+                }
+
+                # TODO check the return value here and only update the max_id if we succeed
+                # this can lead to problems if you have INSERT / QUERY, then QUERY can be run multiple times
+	            $dbh->do("INSERT INTO datalog (name, datakey, value, logged_at) VALUES (?,?,?,?)", undef, $from, $key, $value, $timestamp);
             }
             $dbh->do("UPDATE metadata SET value=? WHERE datakey='max_id'", undef, $dmid);
             $max_id = $dmid;
