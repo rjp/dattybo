@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sinatra'
 require 'dbi'
 require 'haml'
+require 'daterange'
 
 get '/' do
     haml :index
@@ -11,5 +12,6 @@ get '/*/*' do
     splat = params['splat']
     username = splat[0]
     data, date = splat[1].split('/', 2)
-    [splat, data, date].inspect
+    days = daterange(date)
+    [splat, data, date, days].inspect
 end
