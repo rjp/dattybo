@@ -1,0 +1,16 @@
+%table
+ %tr
+  %th Date
+  - @data_vars.each do |d|
+   %th #{d}, #{@info[d][:type]}
+ %tr
+  %td
+  - @data_vars.each do |d|
+   %td
+    graph for #{d}
+    %img(src="#{@info[d][:graph]}")
+ - @days.each do |i|
+  %tr
+   %td= i
+   - @data_vars.each do |d|
+    %td #{d}/#{i}
