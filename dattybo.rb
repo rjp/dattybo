@@ -3,6 +3,7 @@ require 'sinatra'
 require 'dbi'
 require 'haml'
 require 'daterange'
+require 'gchart'
 
 before do
     @dbh = DBI.connect('DBI:sqlite3:/home/rjp/.dattybo.db', '', '')
@@ -35,6 +36,7 @@ get '/*/*' do
         )
         type = type || 'value'
         @info[d][:type] = type
+        chart_data = []
 
         if type[0] == 'counter' then
             data = @dbh.select_all(
@@ -53,7 +55,36 @@ get '/*/*' do
                 dt, ct, mn, mx, av, sm = i
                 @info[d][:data][dt] = sm
             }
+            @days.each { |i|
+                x = @info[d][:data][i] || 0
+                chart_data.push x
+            }
         end
+
+        gc = GChart.bar do |g|
+            g.orientation = :vertical
+            g.data = [chart_data]
+            g.colors = ['#88aaff']
+            g.width = 240
+            g.height = 100
+
+            g.axis(:left) { |a|
+                a.range = 750..2000
+                a.text_color = :black
+                a.font_size = 9
+            }
+
+            g.axis(:bottom) do |a|
+                a.range = 0..@days.size
+                a.labels          = [@days[0], @days[-1]]
+                a.label_positions = [0, @days.size-1]
+                a.text_color = :black
+                a.font_size = 9
+            end
+        end
+
+        @info[d][:graph] = gc.to_url
+        @info[d][:graph_data] = chart_data.inspect
     end
 
     haml :columns
