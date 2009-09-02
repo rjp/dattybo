@@ -7,8 +7,8 @@
   %td
   - @data_vars.each do |d|
    %td
-    graph for #{d}
     %img(src="#{@info[d][:graph]}")
+    <!-- #{@info[d][:graph_data]} -->
  - @days.each do |i|
   %tr
    %td= i
