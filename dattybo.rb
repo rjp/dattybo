@@ -27,7 +27,8 @@ get '/*/*' do
     @info = Hash.new { |h,k| h[k] = {
         :type => 'counter',
         :graph => '',
-        :data => {}
+        :data => Hash.new,
+        :last => Hash.new
     }}
     @data_vars.each do |d|
         type = @dbh.select_one(
@@ -43,7 +44,7 @@ get '/*/*' do
                 "SELECT DATE(logged_at) AS logged_date,
 		               COUNT(1) AS logged, MIN(value) AS min,
 		               MAX(value) AS max, AVG(value) AS avg,
-		               SUM(value) AS sum
+		               SUM(value) AS sum, TIME(MAX(logged_at)) AS last
 		        FROM datalog
 		        WHERE date(logged_at) between ? and ?
                 AND name=? AND datakey=?
@@ -52,8 +53,9 @@ get '/*/*' do
             )
             @info[d][:dump] = data.inspect
             data.each { |i|
-                dt, ct, mn, mx, av, sm = i
+                dt, ct, mn, mx, av, sm, lt = i
                 @info[d][:data][dt] = sm
+                @info[d][:last][dt] = lt
             }
             @days.each { |i|
                 x = @info[d][:data][i] || 0

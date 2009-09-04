@@ -10,7 +10,11 @@
     %img(src="#{@info[d][:graph]}")
     <!-- #{@info[d][:graph_data]} -->
  - @days.each do |i|
-  %tr
+  %tr(style="vertical-align: top")
    %td= i
    - @data_vars.each do |d|
-    %td #{@info[d][:data][i]}
+    %td
+     #{@info[d][:data][i]}
+     %em
+      %small #{(@info[d][:last][i]||'')[0..4]}
+
