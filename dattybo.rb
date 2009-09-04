@@ -63,6 +63,8 @@ get '/*/*' do
             }
         end
 
+# http://chart.apis.google.com/chart?chxl=0:|2009-08-01|2009-08-11|2009-08-21|2009-08-31|1:|750|1000|1250|1500|2000&chxp=0,0.5,10.5,20.5,31.5|1,750,1000,1250,1500,2000&chxs=0,888888,9|1,888888,9,1,lt,cccccc&chs=240x100&chxt=x,y&chxtc=0,6|1,-220&chxr=1,750,2000,0|0,0,31,0&cht=bvg&chbh=a,0,0&chco=88CCFF&chds=750,2000&chd=<DATA>
+# http://chart.apis.google.com/chart?chxs=0,000000,9%7C1,000000,9&chxt=y,x&chs=240x100&chxl=1:%7C2009-09-01%7C2009-09-30&cht=bvs&chco=%2388aaff&chxp=1,0,29&chd=e:qPmf..AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&chxr=0,750,2000%7C1,0,30
         gc = GChart.bar do |g|
             g.orientation = :vertical
             g.data = [chart_data]
