@@ -71,6 +71,8 @@ get '/*/*' do
             g.colors = ['#88aaff']
             g.width = 240
             g.height = 100
+            g.min = 750
+            g.max = 2000
 
             g.axis(:left) { |a|
                 a.range = 750..2000
