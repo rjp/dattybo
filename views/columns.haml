@@ -1,12 +1,12 @@
-%table
+%table{:class=>'data'}
  %tr
   %th Date
   - @data_vars.each do |d|
-   %th #{d}, #{@info[d][:type]}
+   %th{:colspan=>2} #{d}, #{@info[d][:type]}
  %tr
   %td
   - @data_vars.each do |d|
-   %td
+   %td{:colspan=>2}
     %img(src="#{@info[d][:graph]}")
     <!-- #{@info[d][:graph_data]} -->
  - @days.each do |i|
@@ -15,6 +15,6 @@
    - @data_vars.each do |d|
     %td
      #{@info[d][:data][i]}
-     %em
-      %small #{(@info[d][:last][i]||'')[0..4]}
+    %td
+     %small #{(@info[d][:last][i]||'')[0..4]}
 
